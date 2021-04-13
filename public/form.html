@@ -1,0 +1,126 @@
+<html>
+    <body>
+        <div>
+            Signup as an NGO:
+            <hr/>
+            <form action="/ngo_create" method = "POST">
+                <input placeholder="name" name="create_name"/>
+                <input placeholder="email" name="create_email"/>
+                <input placeholder="password" name="create_password"/>
+                <input placeholder="phone" name="create_phone"/>
+                <input placeholder="number of Beneficiaries" name="create_numBene"/>
+                <br>
+                <br>
+                <input placeholder="Location #1" name="create_location1"/>
+                <input placeholder="Location #2" name="create_location2"/>
+                <input placeholder="Location #3" name="create_location3"/>
+                <br>
+                <br>
+                <input placeholder="Service offered#1" name="create_service1"/>
+                <input placeholder="Service offered#2" name="create_service2"/>
+                <input placeholder="Service offered#3" name="create_service3"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <div>
+            Signup as a Family:
+            <hr/>
+            <form action="/family_create" method = "POST">
+                <input placeholder="name" name="create_name"/>
+                <input placeholder="email" name="create_email"/>
+                <input placeholder="password" name="create_password"/>
+                <input placeholder="phone" name="create_phone"/>
+                <input placeholder="number of family members" name="create_numMembers"/>
+                <input placeholder="Average revenue per month (LBP)" name="create_avgRev"/>
+                <br>
+                    <label for="lang">Choose a language:</label>
+                    <select name="create_language" id="create_language">
+                    <option value="arabic">Arabic</option>
+                    <option value="french">French</option>
+                    <option value="english">English</option>
+                    <option value="other">Other</option>
+                    </select>
+                <br>
+                <br>
+                <input placeholder="Location" name="create_location"/>
+                <br>
+                <br>
+                <input placeholder="Service requested#1" name="create_service1"/>
+                <input placeholder="Service requested#2" name="create_service2"/>
+                <input placeholder="Service requested#3" name="create_service3"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <div>
+            Signup as a School:
+            <hr/>
+            <form action="/school_create" method = "POST">
+                <input placeholder="name" name="create_name"/>
+                <input placeholder="email" name="create_email"/>
+                <input placeholder="password" name="create_password"/>
+                <input placeholder="phone" name="create_phone"/>
+                <br>
+                <br>
+                <input placeholder="Location" name="create_location"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <div>
+            Signup as a Teacher:
+            <hr/>
+            <form action="/teacher_create" method = "POST">
+                <input placeholder="first_name" name="create_first_name"/>
+                <input placeholder="last_name" name="create_last_name"/>
+                <input placeholder="email" name="create_email"/>
+                <input placeholder="password" name="create_password"/>
+                <input placeholder="phone" name="create_phone"/>
+                <input placeholder="school" name="create_school_name"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <div>
+            Add a Student:
+            <hr/>
+            <form action="/student_create" method = "POST">
+                <input placeholder="family token" name="create_family_token"/>
+                <input placeholder="first name" name="create_first_name"/>
+                <input placeholder="last name" name="create_last_name"/>
+                <!-- <input placeholder="email" name="create_email"/>
+                <input placeholder="password" name="create_password"/>
+                <input placeholder="phone" name="create_phone"/> -->
+                <input placeholder="age" name="create_age"/>
+                <input placeholder="occupation" name="create_occupation"/>
+                <input placeholder="school" name="create_school_name"/>
+                <br>
+                    <label for="lang">Choose a language:</label>
+                    <select name="create_language" id="create_language">
+                    <option value="arabic">Arabic</option>
+                    <option value="french">French</option>
+                    <option value="english">English</option>
+                    <option value="other">Other</option>
+                    </select>
+                <br>
+                    <label for="degree">Choose a degree:</label>
+                    <select name="create_degree" id="create_degree">
+                    <option value="Elementary">Elementary</option>
+                    <option value="Preparatory level - with Brevet">Preparatory level - with Brevet</option>
+                    <option value="Preparatory level - without Brevet">Preparatory level - without Brevet</option>
+                    <option value="Secondary (grades 10,11,12)">Secondary (grades 10,11,12)</option>
+                    <option value="Vocational">Vocational</option>
+                    <option value="College">College</option>
+                    </select>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

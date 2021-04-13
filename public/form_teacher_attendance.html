@@ -1,0 +1,23 @@
+<html>
+    <body>
+        <div>
+            Submit student attendance:
+            <hr/>
+            <form action="/teacher_student_attendance" enctype="multipart/form-data" method = "POST">
+                <input placeholder="teacher token" name="get_teacher_token"/>
+                <input placeholder="student id" name="get_student_id"/>
+                <br>
+                    <label for="attendance">Student attendance: </label>
+                    <select name="create_attendance" id="create_attendance">
+                    <option value="present">present</option>
+                    <option value="absent">absent</option>
+                    </select>
+                <br>
+                <input type="file" name="myFile" />
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

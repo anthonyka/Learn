@@ -1,0 +1,34 @@
+<html>
+    <body>
+        <div>
+            Family request help:
+            <hr/>
+            <form action="/family-request-help" method = "POST">
+                <input placeholder="family token" name="get_family_token"/>
+                <input placeholder="ngo id" name="get_ngo_id"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <br>
+        <br>
+        <div>
+            NGO manage requests:
+            <hr/>
+            <form action="/ngo-manage-request" method = "POST">
+                <input placeholder="ngo token" name="get_ngo_token"/>
+                <input placeholder="family id" name="get_family_id"/>
+                <br>
+                    <label for="status">Choose what to do:</label>
+                    <select name="create_status" id="create_status">
+                    <option value="approve">approve</option>
+                    <option value="reject">reject</option>
+                    </select>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

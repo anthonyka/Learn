@@ -1,0 +1,27 @@
+{
+  "name": "backendtest",
+  "version": "1.0.0",
+  "description": "testing backend for wasle",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Anthony K",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "chai": "^4.3.4",
+    "express": "^4.17.1",
+    "mocha": "^8.3.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "mysql": "^2.18.1",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "supertest": "^6.1.3"
+  }
+}
