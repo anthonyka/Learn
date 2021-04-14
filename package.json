@@ -4,6 +4,7 @@
   "description": "testing backend for wasle",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "mocha"
   },
   "author": "Anthony K",
