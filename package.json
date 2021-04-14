@@ -18,6 +18,10 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   },
+  "engines": {
+    "node": "0.14.x",
+    "npm": "6.x"
+  },
   "devDependencies": {
     "supertest": "^6.1.3"
   }
