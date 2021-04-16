@@ -8,7 +8,7 @@ const FSrelation = require("../common/family_student_rel");
 
 module.exports = StudentRouter;
 
-app.get("/student", (req,res)=>{
+StudentRouter.get("/student", (req,res)=>{
     console.log("responding to root route");
     res.send("Welcome to student page");
 })
