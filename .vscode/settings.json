@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/964298d1-6043-45bc-b05c-a7b52a807554/resourceGroups/wasle_pics/providers/Microsoft.Web/sites/wasle",
+    "appService.deploySubpath": "."
+}

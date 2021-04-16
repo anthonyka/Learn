@@ -4,7 +4,12 @@ const path = require('path');
 const db = require('../connections');
 const TeacherRouter = express.Router();
 const STrelation = require("../common/school_teacher_rel");
+const TSrelation = require("../common/teacher_student_rel");
 const cloudStorage = require('../common/cloud_storage');
+const { RestError } = require('@azure/core-http');
+const { WSAEMFILE } = require('constants');
+const async = require ('async');
+const util = require('util');
 
 module.exports = TeacherRouter;
 
@@ -93,7 +98,7 @@ TeacherRouter.post("/teacher_student_attendance", upload.single('myFile'), (req,
     if(attendance == "present"){
         attendanceDB = 1;
         excuse = 0;
-    }else if(attendance == "absent without excuse"){
+    }else if(attendance == "absent-without-excuse"){
         attendanceDB = 0;
         excuse = 0;
     }else{
@@ -104,26 +109,85 @@ TeacherRouter.post("/teacher_student_attendance", upload.single('myFile'), (req,
     const file = req.file;
     console.log(file);
     if (!file) {
-        const error = new Error('Please upload a file')
+        const error = new Error('Please upload a file if student is present or has an excuse')
         error.httpStatusCode = 400
         return next(error)
     }
 
-    cloudStorage.uploadAttendanceSheet(req.file.filename,req.file.path).then(cloud_url => {
-        db.query("INSERT into student_attendance (teacher_id,student_id, attendance, attendance_sheet, valid_excuse) values(?,?,?,?,?)",[teacher_token,student_id,attendanceDB,cloud_url,excuse],(err,res,fields)=>{
+    else{
+        db.query("SELECT * FROM teacher_student_relation WHERE teacher_id = ? AND student_id = ?",[teacher_token, student_id],(err,res,fields)=>{
             if(err){
-                console.log("error student attendance");
+                console.log("error student is not in class");
                 throw err;
+            }else if(res.length>=1){
+                console.log("student is in teacher's class");
+                cloudStorage.uploadAttendanceSheet(req.file.filename,req.file.path).then(cloud_url => {
+                    db.query("INSERT into student_attendance (teacher_id,student_id, attendance, attendance_sheet, valid_excuse) values(?,?,?,?,?)",[teacher_token,student_id,attendanceDB,cloud_url,excuse],(err,res,fields)=>{
+                        if(err){
+                            console.log("error student attendance");
+                            throw err;
+                        }else{
+                            console.log("successfully added student attendance");
+                        }
+                    })
+                }).catch(err => {throw err})
             }else{
-                console.log("successfully added student attendance");
+                console.log("student is not in class of teacher");
             }
         })
-    }).catch(err => {throw err})
+    }
 
     res.sendFile(`${__dirname}/assets/${req.file.filename}`)
 })
 
-TeacherRouter.get("teacher")
+TeacherRouter.post("/add_student_to_class",(req,res)=>{
+
+    const teacher_token =  req.body.get_teacher_token;
+    const student_id =  req.body.get_student_id;
+
+    db.query("INSERT into teacher_student_relation (teacher_id,student_id) values(?,?)",[teacher_token,student_id],(err,res,fields)=>{
+        if(err){
+            console.log("error adding student to class");
+            throw err;
+        }else{
+            console.log("successfully added student to class");
+        }
+    })
+    res.send("done");
+})
+
+TeacherRouter.get("/teacher_student_list/:id", (req,res)=>{
+    var teacher_token = req.params.id;
+    console.log("Fetching list of students in teacher's class");
+    db.query("SELECT student_id FROM teacher_student_relation WHERE teacher_id = ?", [teacher_token], (err,rows,fields)=>{
+        if(err){
+            console.log("error fetching student list");
+            throw err;
+        }else{
+            console.log("teacher-student list fetched");
+            let students = [];
+            async.forEachOf(rows, function(row, index, inner_callback){
+                let student_id = row.student_id;
+                console.log("student id: " + student_id);
+                db.query("SELECT * FROM student WHERE student_id = ?", [student_id], (err,row,fields)=>{
+                    if(err){
+                        inner_callback(err);
+                        throw err;
+                    }else{
+                        console.log(util.inspect(row, {depth: null}));
+                        students.push(row);
+                    }
+                    inner_callback();
+                })
+            },function(err){
+                if(err){
+                    throw err;
+                }
+                res.json(students);
+            });
+        }
+    })
+})
 
 
  

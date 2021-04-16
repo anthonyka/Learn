@@ -1,6 +1,19 @@
 <html>
     <body>
         <div>
+            Add student to class:
+            <hr/>
+            <form action="/add_student_to_class" method = "POST">
+                <input placeholder="teacher token" name="get_teacher_token"/>
+                <input placeholder="student id" name="get_student_id"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+            <br>
+            <br>
+        </div>
+        <div>
             Submit student attendance:
             <hr/>
             <form action="/teacher_student_attendance" enctype="multipart/form-data" method = "POST">
