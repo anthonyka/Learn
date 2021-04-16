@@ -8,6 +8,11 @@ const FSrelation = require("../common/family_student_rel");
 
 module.exports = StudentRouter;
 
+app.get("/student", (req,res)=>{
+    console.log("responding to root route");
+    res.send("Welcome to student page");
+})
+
 function walletCreation(student_id){
     db.query('INSERT into wallet (user_id) values (?)', [student_id], (err, rows) => {
         if (err){
