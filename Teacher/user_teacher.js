@@ -4,7 +4,7 @@ const path = require('path');
 const db = require('../connections');
 const TeacherRouter = express.Router();
 const STrelation = require("../common/school_teacher_rel");
-
+const cloudStorage = require('../common/cloud_storage');
 
 module.exports = TeacherRouter;
 
@@ -87,16 +87,43 @@ TeacherRouter.post("/teacher_student_attendance", upload.single('myFile'), (req,
     const teacher_token =  req.body.get_teacher_token;
     const student_id =  req.body.get_student_id;
     const attendance =  req.body.create_attendance;
+    
+    var attendanceDB;
+    var excuse;
+    if(attendance == "present"){
+        attendanceDB = 1;
+        excuse = 0;
+    }else if(attendance == "absent without excuse"){
+        attendanceDB = 0;
+        excuse = 0;
+    }else{
+        attendanceDB = 0;
+        excuse = 1;
+    }
 
     const file = req.file;
     console.log(file);
-  if (!file) {
-    const error = new Error('Please upload a file')
-    error.httpStatusCode = 400
-    return next(error)
-  }
+    if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        return next(error)
+    }
+
+    cloudStorage.uploadAttendanceSheet(req.file.filename,req.file.path).then(cloud_url => {
+        db.query("INSERT into student_attendance (teacher_id,student_id, attendance, attendance_sheet, valid_excuse) values(?,?,?,?,?)",[teacher_token,student_id,attendanceDB,cloud_url,excuse],(err,res,fields)=>{
+            if(err){
+                console.log("error student attendance");
+                throw err;
+            }else{
+                console.log("successfully added student attendance");
+            }
+        })
+    }).catch(err => {throw err})
+
     res.sendFile(`${__dirname}/assets/${req.file.filename}`)
 })
+
+TeacherRouter.get("teacher")
 
 
  
