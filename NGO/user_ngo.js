@@ -145,17 +145,8 @@ NGOrouter.post("/ngo-manage-request", (req,res)=>{
                 if (err){
                     console.log("error update status of fam request");
                     throw err;
-                }else if(status == "approve"){
-                    db.query('UPDATE family SET is_receiving_help = ? WHERE family_id = ?', [1,family_id],(err,row,fields)=>{
-                        if(err){
-                            throw(err);
-                        }else{
-                            res.send("request of family " + family_id + ": " + status);
-                        }
-                    })
-                }else{
-                    res.send("request of family " + family_id + ": " + status);
                 }
+                res.send("request of family " + family_id + ": " + status);
             })
         }
     })

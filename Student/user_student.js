@@ -3,10 +3,21 @@ const db = require('../connections');
 const StudentRouter = express.Router();
 const SSrelation = require("../common/school_student_rel");
 const FSrelation = require("../common/family_student_rel");
+const wallet = require("../common/wallet");
+const async = require ('async');
+const util = require('util');
 
+const schedule = require('node-schedule');
 
 
 module.exports = StudentRouter;
+
+//triggers once every month
+const job = schedule.scheduleJob('0 0 1 * *', function(){
+    console.log("event add coins triggered");
+    console.log("ran at" + new Date());
+    wallet.addCoins();
+});
 
 StudentRouter.get("/student", (req,res)=>{
     console.log("responding to root route");
@@ -93,6 +104,69 @@ StudentRouter.get('/wallet-balance/:id',(req,res)=>{
         }
     })
 })
+
+StudentRouter.post("/redeem_coin",(req,res)=>{
+    const family_token =  req.body.get_family_token;
+    const student_id =  req.body.get_student_id;
+    const ngo_id =  req.body.get_ngo_id;
+
+    console.log(`Family ${family_token} redeeming ${1} token of student ${student_id} at NGO ${ngo_id}`);
+    db.query('SELECT student_id FROM family_student_relation WHERE student_id = ? AND family_id = ?',[student_id, family_token],(err,rows,fields)=>{
+        if(err){
+            throw err;
+        }
+        if(rows.length<=0){
+            console.log("student is not a member of the family")
+            res.send("student not member of family");
+        }else{
+            db.query("SELECT * FROM ngo_family_relation WHERE family_id = ? AND ngo_id = ?",[family_token,ngo_id],(err,rows,fields)=>{
+                if(err){
+                    throw err;
+                }
+                if(rows.length<0){
+                    console.log("relation does not exist");
+                    res.send("please request aid from NGO first");
+                }
+                if(rows[0].status == 'reject'){
+                    console.log("ngo has rejected help, can't redeem token");
+                    res.send("ngo has rejected help, can't redeem token");
+                }else if(rows[0].status == 'approve'){
+                    console.log("token is being redeemed");
+                    var result;
+                    try{
+                        result = wallet.decreaseBalance(student_id);
+                    }catch(err){
+                        console.log("an error occured");
+                        throw err;
+                    }
+                    if(result == "no funds"){
+                        res.send("not enough funds");      
+                    }
+                    else{
+                        db.query('UPDATE ngo_family_relation SET is_aid_active = ? WHERE family_id = ? AND ngo_id = ?',[1,family_token,ngo_id],(err,rows,fields)=>{
+                            if(err){
+                                throw err;
+                            }else{
+                                console.log("aid is now active");
+                                db.query('UPDATE family SET is_receiving_help = ? WHERE family_id = ?',[1,family_token],(err,rows,fields)=>{
+                                    if(err){
+                                        throw err;
+                                    }else{
+                                        console.log("family is receiving help from at least one ngo");
+                                        res.send("done");
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        }
+    })
+})
+
+
+
 
 
 

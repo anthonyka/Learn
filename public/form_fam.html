@@ -14,6 +14,20 @@
         <br>
         <br>
         <div>
+            Redeem tokens:
+            <hr/>
+            <form action="/redeem_coin" method = "POST">
+                <input placeholder="family token" name="get_family_token"/>
+                <input placeholder="student id" name="get_student_id"/>
+                <input placeholder="NGO" name="get_ngo_id"/>
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+        <br>
+        <br>
+        <div>
             NGO manage requests:
             <hr/>
             <form action="/ngo-manage-request" method = "POST">
