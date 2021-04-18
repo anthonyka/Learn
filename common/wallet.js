@@ -62,22 +62,25 @@ module.exports.addCoins = function addCoins(){
 
 module.exports.decreaseBalance = function decreaseBalance(student_id){
     console.log("trying to decrease balance");
-    db.query('SELECT balance FROM wallet WHERE user_id = ?',[student_id],(err,row,fields)=>{
-        if(err){
-            console.log("an error occured while fetching wallet to decrease funds");
-            throw(err);
-        }if(row[0].balance<0){
-            return "no funds";
-        }else{
-            db.query('UPDATE wallet SET balance = ? WHERE user_id = ?',[row[0].balance-1, student_id],(err,rows,fields)=>{
-                if(err){
-                    console.log("an error occured while decreasing balance");
-                    throw err;
-                }else{
-                    return "done";
-                }
-            })
-        }
+    return new Promise(function(resolve,reject){
+        db.query('SELECT balance FROM wallet WHERE user_id = ?',[student_id],(err,row,fields)=>{
+            if(err){
+                console.log("an error occured while fetching wallet to decrease funds");
+                throw(err);
+            }if(row[0].balance<=0){
+                console.log("returning 0");
+                return resolve(0);
+            }else{
+                db.query('UPDATE wallet SET balance = ? WHERE user_id = ?',[row[0].balance-1, student_id],(err,rows,fields)=>{
+                    if(err){
+                        console.log("an error occured while decreasing balance");
+                        throw err;
+                    }else{
+                        return resolve(1);
+                    }
+                })
+            }
+        })
     })
 }
 

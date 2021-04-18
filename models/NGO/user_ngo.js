@@ -1,8 +1,8 @@
 const express = require('express');
-const db = require('../connections');
+const db = require('../../connections');
 const NGOrouter = express.Router();
-const locations = require("../common/location");
-const services = require("../common/service");
+const locations = require("../../common/location");
+const services= require("../../common/service");
 const async = require ('async');
 const util = require('util');
 
@@ -133,20 +133,21 @@ NGOrouter.post("/ngo-manage-request", (req,res)=>{
     //basic info
     const ngo_token =  req.body.get_ngo_token;
     const family_id =  req.body.get_family_id;
+    const student_id =  req.body.get_student_id;
     const status =  req.body.create_status;
 
-    db.query('SELECT * FROM family WHERE family_id = ?', [family_id], (err, rows) => {
+    db.query('SELECT * FROM family WHERE family_id = ?', [family_id,student_id], (err, rows) => {
         if (err){
             throw err;
         }else if(rows.length<0){
             res.send("family doesn't exist");
         }else{
-            db.query('UPDATE ngo_family_relation SET status = ? WHERE ngo_id = ? AND family_id = ?',[status,ngo_token,family_id], (err,result) => {
+            db.query('UPDATE ngo_family_relation SET status = ? WHERE ngo_id = ? AND family_id = ? AND student_id = ?',[status,ngo_token,family_id,student_id], (err,result) => {
                 if (err){
                     console.log("error update status of fam request");
                     throw err;
                 }
-                res.send("request of family " + family_id + ": " + status);
+                res.send(`Request of family ${family_id} for student ${student_id} is ${status}`);
             })
         }
     })

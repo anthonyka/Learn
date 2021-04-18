@@ -1,8 +1,8 @@
 const express = require('express');
-const db = require('../connections');
+const db = require('../../connections');
 const FamilyRouter = express.Router();
-const locations = require("../common/location");
-const services = require("../common/service");
+const locations = require("../../common/location");
+const services= require("../../common/service");
 
 
 module.exports = FamilyRouter;
@@ -65,6 +65,7 @@ FamilyRouter.post("/family_create", (req,res)=>{
 
 FamilyRouter.post("/family-request-help", (req,res)=>{
     const ngo_id =  req.body.get_ngo_id;
+    const student_id =  req.body.get_student_id;
     const family_token = req.body.get_family_token;
     db.query("SELECT * FROM ngo WHERE id = ?",[ngo_id] ,(err,rows,fields)=>{
         if(err){
@@ -72,15 +73,35 @@ FamilyRouter.post("/family-request-help", (req,res)=>{
             res.sendStatus(500);
             throw err;
         }else{
-            db.query("INSERT into ngo_family_relation (ngo_id, family_id, status) values (?,?,?)", [ngo_id,family_token,"pending"], (err, result)=>{
-                if (err){
-                    console.log("error creating ngo_family_rel");
+            db.query('SELECT student_id FROM family_student_relation WHERE student_id = ? AND family_id = ?',[student_id, family_token],(err,rows,fields)=>{
+                if(err){
                     throw err;
-                }else{
-                    console.log("family request added: ");
-                    res.send("Done");
                 }
-            });
+                if(rows.length<=0){
+                    console.log("student is not a member of the family")
+                    res.send("student not member of family");
+                }else{
+                    db.query("SELECT * FROM ngo_family_relation WHERE ngo_id = ? AND family_id = ? AND student_id = ?", [ngo_id,family_token,student_id],(err,rows,fields)=>{
+                        if(err){
+                            throw err;
+                        }else if(rows.length>0){
+                            console.log("request already made");
+                            res.send("request already made");
+                        }else{
+                            db.query("INSERT into ngo_family_relation (ngo_id, family_id, student_id, status) values (?,?,?,?)", [ngo_id,family_token,student_id,"pending"], (err, result)=>{
+                                if (err){
+                                    console.log("error creating ngo_family_rel");
+                                    throw err;
+                                }else{
+                                    console.log("family request added: ");
+                                    res.send("family request added");
+                                }
+                            });
+                        }
+                    })
+                }
+            })
+            
         }
     });
 })

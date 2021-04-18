@@ -1,9 +1,9 @@
 const express = require('express');
-const db = require('../connections');
+const db = require('../../connections');
 const StudentRouter = express.Router();
-const SSrelation = require("../common/school_student_rel");
-const FSrelation = require("../common/family_student_rel");
-const wallet = require("../common/wallet");
+const SSrelation = require("../../common/school_student_rel");
+const FSrelation = require("../../common/family_student_rel");
+const wallet = require("../../common/wallet");
 const async = require ('async');
 const util = require('util');
 
@@ -119,31 +119,31 @@ StudentRouter.post("/redeem_coin",(req,res)=>{
             console.log("student is not a member of the family")
             res.send("student not member of family");
         }else{
-            db.query("SELECT * FROM ngo_family_relation WHERE family_id = ? AND ngo_id = ?",[family_token,ngo_id],(err,rows,fields)=>{
+            db.query("SELECT * FROM ngo_family_relation WHERE family_id = ? AND ngo_id = ? AND student_id = ?",[family_token,ngo_id,student_id],(err,rows,fields)=>{
                 if(err){
                     throw err;
                 }
-                if(rows.length<0){
+                console.log(rows[0].is_aid_active);
+                if(rows.length<0 || rows[0].is_aid_active==1){
                     console.log("relation does not exist");
-                    res.send("please request aid from NGO first");
+                    res.send("request aid from NGO or you are already receiving aid");
                 }
-                if(rows[0].status == 'reject'){
+                else if(rows[0].status == 'reject'){
                     console.log("ngo has rejected help, can't redeem token");
                     res.send("ngo has rejected help, can't redeem token");
                 }else if(rows[0].status == 'approve'){
                     console.log("token is being redeemed");
-                    var result;
-                    try{
-                        result = wallet.decreaseBalance(student_id);
-                    }catch(err){
-                        console.log("an error occured");
-                        throw err;
-                    }
-                    if(result == "no funds"){
+                    var result = 0;
+                    wallet.decreaseBalance(student_id).then(function(v){
+                        result = v;
+
+                        console.log(result);
+                    
+                    if(result == 0){
                         res.send("not enough funds");      
                     }
                     else{
-                        db.query('UPDATE ngo_family_relation SET is_aid_active = ? WHERE family_id = ? AND ngo_id = ?',[1,family_token,ngo_id],(err,rows,fields)=>{
+                        db.query('UPDATE ngo_family_relation SET is_aid_active = ? WHERE family_id = ? AND ngo_id = ? AND student_id = ?',[1,family_token,ngo_id,student_id],(err,rows,fields)=>{
                             if(err){
                                 throw err;
                             }else{
@@ -159,6 +159,8 @@ StudentRouter.post("/redeem_coin",(req,res)=>{
                             }
                         })
                     }
+                    })
+                    
                 }
             })
         }

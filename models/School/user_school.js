@@ -1,7 +1,7 @@
 const express = require('express');
-const db = require('../connections');
+const db = require('../../connections');
 const SchoolRouter = express.Router();
-const locations = require("../common/location");
+const locations = require("../../common/location");
 
 
 module.exports = SchoolRouter;

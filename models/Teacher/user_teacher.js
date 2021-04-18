@@ -1,11 +1,11 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const db = require('../connections');
+const db = require('../../connections');
 const TeacherRouter = express.Router();
-const STrelation = require("../common/school_teacher_rel");
-const TSrelation = require("../common/teacher_student_rel");
-const cloudStorage = require('../common/cloud_storage');
+const STrelation = require("../../common/school_teacher_rel");
+const TSrelation = require("../../common/teacher_student_rel");
+const cloudStorage = require('../../common/cloud_storage');
 const { RestError } = require('@azure/core-http');
 const { WSAEMFILE } = require('constants');
 const async = require ('async');
@@ -15,7 +15,7 @@ module.exports = TeacherRouter;
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'Teacher/assets/');
+        cb(null, 'models/Teacher/assets/');
     },
     filename: function(req,file,cb){
         const parts = file.mimetype.split("/");
@@ -145,15 +145,18 @@ TeacherRouter.post("/add_student_to_class",(req,res)=>{
     const teacher_token =  req.body.get_teacher_token;
     const student_id =  req.body.get_student_id;
 
-    db.query("INSERT into teacher_student_relation (teacher_id,student_id) values(?,?)",[teacher_token,student_id],(err,res,fields)=>{
-        if(err){
-            console.log("error adding student to class");
+    db.query('SELECT * FROM teacher_student_relation WHERE student_id = ?' , [student_id], (err, rows) => {
+        console.log(rows);
+        if (err){
             throw err;
+        }else if(rows.length>0){
+            console.log("relation already exists")
+            res.send("student is already in class");
         }else{
-            console.log("successfully added student to class");
+            TSrelation.AddTSrelation(student_id,teacher_token);
+            res.send("added student to teacher's class");
         }
     })
-    res.send("done");
 })
 
 TeacherRouter.get("/teacher_student_list/:id", (req,res)=>{
@@ -188,6 +191,3 @@ TeacherRouter.get("/teacher_student_list/:id", (req,res)=>{
         }
     })
 })
-
-
- 
